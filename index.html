@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responder Cliente</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #131a2a;
+      --accent: #00c3ff;
+      --accent-hover: #009ed1;
+      --text: #fff;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      margin: 6px 0;
+      word-break: break-word;
+    }
+
+    textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #1f2a3d;
+      padding: 12px;
+      font-size: 1rem;
+      resize: none;
+      min-height: 120px;
+      background: #0e1422;
+      color: var(--text);
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 16px;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.2rem;
+      }
+      textarea {
+        font-size: 0.95rem;
+      }
+      button {
+        font-size: 0.95rem;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Responder Cliente</h2>
+    <p><b>Nome:</b> <span id="name"></span></p>
+    <p><b>Telefone:</b> <span id="phone"></span></p>
+    <p><b>Mensagem:</b> <span id="msg"></span></p>
+
+    <textarea id="reply" placeholder="Digite sua resposta..."></textarea>
+    <button onclick="enviar()">📩 Enviar Resposta</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const phone = params.get("phone");
+    const msg = params.get("msg");
+
+    document.getElementById("name").textContent = name || "Cliente";
+    document.getElementById("phone").textContent = phone || "-";
+    document.getElementById("msg").textContent = msg || "-";
+
+    async function enviar() {
+      const reply = document.getElementById("reply").value.trim();
+      if (!reply) return alert("Digite uma mensagem antes de enviar.");
+
+      const payload = { to: phone, reply: reply, name: name };
+
+      try {
+        await fetch("https://deccel-ia-n8n-webhook.cdqhrl.easypanel.host/webhook/envia mensagem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        alert("Mensagem enviada com sucesso!");
+        document.getElementById("reply").value = "";
+      } catch (e) {
+        alert("Erro ao enviar: " + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
